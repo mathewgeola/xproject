@@ -10,7 +10,7 @@ import httpx
 import tldextract
 from w3lib.url import canonicalize_url
 
-from xproject.headers import get_default_headers
+from xproject.xheaders import get_default_headers
 
 
 def get_furl_obj(url: str) -> furl.furl:

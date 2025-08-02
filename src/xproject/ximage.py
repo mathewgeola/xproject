@@ -51,7 +51,7 @@ def image_to_jpg(
 
 
 if __name__ == '__main__':
-    from xproject.url import url_to_file_path
+    from xproject.xurl import url_to_file_path
 
     input_file_path = url_to_file_path(
         # "https://img.jslink.com/FILE41f4c4a5db4e4007b09ae2dd2e08d853.JPG"

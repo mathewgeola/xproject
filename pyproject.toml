@@ -1,9 +1,9 @@
 [project]
 name = "xproject"
-version = "0.0.1"
+version = "0.0.2"
 description = ""
 authors = [
-    {name = "mathewgeola",email = "mathewgeola@gmail.com"}
+    { name = "mathewgeola", email = "mathewgeola@gmail.com" }
 ]
 readme = "README.md"
 requires-python = ">=3.12"
@@ -15,10 +15,15 @@ dependencies = [
     "fake-useragent (>=2.2.0,<3.0.0)",
     "pillow (>=11.3.0,<12.0.0)",
     "pillow-avif-plugin (>=1.5.2,<2.0.0)",
-    "w3lib (>=2.3.1,<3.0.0)"
+    "w3lib (>=2.3.1,<3.0.0)",
+    "colorlog (>=6.9.0,<7.0.0)",
+    "rich (>=14.1.0,<15.0.0)"
 ]
 
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+generate_init_py = "scripts.generate_init_py:main"

@@ -3,7 +3,10 @@ import zipfile
 from typing import Literal
 
 
-def compress_dir_path(dir_path: str, compress_type: Literal["zip"] = "zip") -> str | None:
+def compress_dir_path(
+        dir_path: str,
+        compress_type: Literal["zip"] = "zip"
+) -> str | None:
     dir_path = os.path.abspath(dir_path)
 
     if not os.path.isdir(dir_path):
