@@ -1,0 +1,2 @@
+class ImportClassTypeError(TypeError):
+    pass

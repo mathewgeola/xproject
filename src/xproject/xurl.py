@@ -261,7 +261,7 @@ def url_to_file_path(
                     if file_suffix is None or file_suffix == "":
                         response = httpx.head(url, headers=headers)
                         if (content_type := response.headers.get("content-type")) is not None:
-                            # todo：add more content_type
+                            # todo：Add more content_type.
                             content_type_to_file_suffix: Final[dict[str, str]] = {
                                 "image/png": "png",
                                 "image/gif": "gif",
