@@ -1,5 +1,6 @@
-import sqlparse
 from typing import Any
+
+import sqlparse
 
 
 def format_sql(sql: str, **kwargs: Any) -> str:

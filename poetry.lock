@@ -788,6 +788,22 @@ test = ["pytest (>=8.2)", "pytest-asyncio (>=0.24.0)"]
 zstd = ["zstandard"]
 
 [[package]]
+name = "pymysql"
+version = "1.1.1"
+description = "Pure Python MySQL Driver"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "PyMySQL-1.1.1-py3-none-any.whl", hash = "sha256:4de15da4c61dc132f4fb9ab763063e693d521a80fd0e87943b9a453dd4c19d6c"},
+    {file = "pymysql-1.1.1.tar.gz", hash = "sha256:e127611aaf2b417403c60bf4dc570124aeb4a57f5f37b8e95ae399a42f904cd0"},
+]
+
+[package.extras]
+ed25519 = ["PyNaCl (>=1.4.0)"]
+rsa = ["cryptography"]
+
+[[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
 description = "Extensions to the standard Python datetime module"
@@ -801,6 +817,23 @@ files = [
 
 [package.dependencies]
 six = ">=1.5"
+
+[[package]]
+name = "redis"
+version = "6.2.0"
+description = "Python client for Redis database and key-value store"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "redis-6.2.0-py3-none-any.whl", hash = "sha256:c8ddf316ee0aab65f04a11229e94a64b2618451dab7a67cb2f77eb799d872d5e"},
+    {file = "redis-6.2.0.tar.gz", hash = "sha256:e821f129b75dde6cb99dd35e5c76e8c49512a5a0d8dfdc560b2fbd44b85ca977"},
+]
+
+[package.extras]
+hiredis = ["hiredis (>=3.2.0)"]
+jwt = ["pyjwt (>=2.9.0)"]
+ocsp = ["cryptography (>=36.0.1)", "pyopenssl (>=20.0.1)", "requests (>=2.31.0)"]
 
 [[package]]
 name = "requests"
@@ -1066,4 +1099,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "208fd82a4fb7f59def252ff17e8d11fdeba3da0f06fe770cd52d6becb324e95b"
+content-hash = "fc44bd677feaf6b58c949825e8f0c381af3a9760a121871168b1596ee5dfaee6"

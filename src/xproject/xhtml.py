@@ -1,5 +1,6 @@
 import html
 from typing import Any
+
 from htmlmin import minify
 
 

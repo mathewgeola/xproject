@@ -4,8 +4,8 @@ from atexit import register
 from types import TracebackType
 from typing import Any, Self
 
-from xproject.xmixins.xcreate_instance_mixin import CreateInstanceMixin
 from xproject.xcall import async_call_method
+from xproject.xmixins.xcreate_instance_mixin import CreateInstanceMixin
 
 
 class ContextManagerMixin(CreateInstanceMixin, ABC):

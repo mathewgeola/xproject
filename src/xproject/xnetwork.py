@@ -1,6 +1,7 @@
-import httpx
 import socket
 from typing import Literal
+
+import httpx
 
 
 def check_port_occupancy(port: int) -> bool:

@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import Any
 
 from rich.console import Console
 from rich.syntax import Syntax
@@ -7,21 +8,25 @@ from rich.syntax import Syntax
 console = Console()
 
 
-def generate_init_py(dir_path: str) -> int:
+def _generate_init_py_by_dir_path(dir_path: str) -> int:
     dir_path = os.path.abspath(dir_path)
     if not os.path.isdir(dir_path):
         return 1
 
+    if os.path.basename(dir_path) == "__pycache__":
+        return 0
+
     py_file_names = [
         file_name for file_name in sorted(os.listdir(dir_path))
-        if file_name.endswith(".py") and file_name not in ("__init__.py", "__main__.py")
+        if (file_name.endswith(".py") and file_name not in ("__init__.py", "__main__.py")) or
+           (os.path.isdir(os.path.join(dir_path, file_name)) and file_name != "__pycache__")
     ]
     module_names = [os.path.splitext(py_file_name)[0] for py_file_name in py_file_names]
     if not module_names:
         return 0
 
     init_py_file_content_a = "\n".join(f"from . import {module_name}" for module_name in module_names)
-    init_py_file_content_b = ",\n    ".join(f"'{module_name}'" for module_name in module_names)
+    init_py_file_content_b = ",\n    ".join(f"\"{module_name}\"" for module_name in module_names)
 
     init_py_file_content = f"""{init_py_file_content_a}
 
@@ -41,6 +46,21 @@ __all__ = [
     return 0
 
 
-def main():
-    dir_path = sys.argv[1] if len(sys.argv) > 1 else "."
-    sys.exit(generate_init_py(dir_path))
+def _generate_init_py_by_root_dir_path(root_dir_path: str) -> int:
+    root_dir_path = os.path.abspath(root_dir_path)
+    if not os.path.isdir(root_dir_path):
+        return 1
+
+    if os.path.basename(root_dir_path) == "__pycache__":
+        return 0
+
+    for root, dirs, files in os.walk(root_dir_path):
+        if _generate_init_py_by_dir_path(root) != 0:
+            return 1
+
+    return 0
+
+
+def main(*args: Any) -> None:
+    dir_path = args[0] if len(args) >= 1 else sys.argv[1] if len(sys.argv) > 1 else "."
+    sys.exit(_generate_init_py_by_root_dir_path(dir_path))
