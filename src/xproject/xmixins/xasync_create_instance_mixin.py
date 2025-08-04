@@ -2,10 +2,10 @@ from abc import ABC
 from collections.abc import Awaitable
 from typing import Any, Self
 
-from xproject.xcall import call_method
+from xproject.xcall import async_call_method
 
 
-class CreateInstanceMixin(ABC):
+class AsyncCreateInstanceMixin(ABC):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._is_closed: bool | None = None
 
@@ -13,17 +13,17 @@ class CreateInstanceMixin(ABC):
     def create_instance(cls, *args: Any, **kwargs: Any) -> Self | Awaitable[Self]:
         return cls(*args, **kwargs)
 
-    def open(self) -> None:
+    async def open(self) -> None:
         if self.is_closed:
-            call_method(method=self._open)
+            await async_call_method(method=self._open)
         self._is_closed = False
 
     def _open(self) -> None:
         pass
 
-    def close(self) -> None:
+    async def close(self) -> None:
         if not self.is_closed:
-            call_method(method=self._close)
+            await async_call_method(method=self._close)
         self._is_closed = True
 
     def _close(self) -> None:
