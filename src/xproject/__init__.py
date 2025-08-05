@@ -15,6 +15,7 @@ from . import xhttp
 from . import ximage
 from . import ximporter
 from . import xjavascript
+from . import xjson
 from . import xlist
 from . import xlogger
 from . import xmath
@@ -22,6 +23,7 @@ from . import xmixins
 from . import xnetwork
 from . import xreverse
 from . import xsignal
+from . import xspider
 from . import xsql
 from . import xstring
 from . import xtypes
@@ -46,6 +48,7 @@ __all__ = [
     "ximage",
     "ximporter",
     "xjavascript",
+    "xjson",
     "xlist",
     "xlogger",
     "xmath",
@@ -53,6 +56,7 @@ __all__ = [
     "xnetwork",
     "xreverse",
     "xsignal",
+    "xspider",
     "xsql",
     "xstring",
     "xtypes",
