@@ -17,23 +17,27 @@ class RedisDB(DB):
     ) -> None:
         super().__init__(*args, **kwargs)
 
-        self.host = host
-        self.port = port
-        self.password = password
-        self.dbname = dbname
+        self._host = host
+        self._port = port
+        self._password = password
+        self._dbname = dbname
 
         self._redis: Redis | None = None
 
-    def _open(self) -> None:
+    def open(self) -> None:
         self._redis = Redis(
-            host=self.host,
-            port=self.port,
-            db=self.dbname,
-            password=self.password,
+            host=self._host,
+            port=self._port,
+            db=self._dbname,
+            password=self._password,
             encoding="utf-8",
             decode_responses=True
         )
 
-    def _close(self) -> None:
+    def close(self) -> None:
         self._redis.close()
         self._redis = None
+
+    @property
+    def redis(self) -> Redis:
+        return self._redis

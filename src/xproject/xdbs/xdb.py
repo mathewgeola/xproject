@@ -1,10 +1,10 @@
 from typing import Any, Self
 
-from xproject.xmixins.xcontext_manager_mixin import ContextManagerMixin
+from xproject.xmixins.xobject_mixins.xcontext_manager_object_mixin import ContextManagerObjectMixin
 
 
-class DB(ContextManagerMixin):
+class DB(ContextManagerObjectMixin):
     @classmethod
     def from_uri(cls, *args: Any, **kwargs: Any) -> Self:
-        ins = cls.create_instance(*args, **kwargs)
+        ins = super().create_instance(*args, **kwargs)
         return ins

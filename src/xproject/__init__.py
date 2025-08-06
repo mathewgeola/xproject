@@ -21,6 +21,7 @@ from . import xlogger
 from . import xmath
 from . import xmixins
 from . import xnetwork
+from . import xobjects
 from . import xreverse
 from . import xsignal
 from . import xspider
@@ -54,6 +55,7 @@ __all__ = [
     "xmath",
     "xmixins",
     "xnetwork",
+    "xobjects",
     "xreverse",
     "xsignal",
     "xspider",

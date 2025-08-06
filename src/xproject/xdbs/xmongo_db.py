@@ -21,37 +21,45 @@ class MongoDB(DB):
     ) -> None:
         super().__init__(*args, **kwargs)
 
-        self.host = host
-        self.port = port
-        self.username = username
-        self.password = password
-        self.uri = uri
-        self.dbname = dbname
+        self._host = host
+        self._port = port
+        self._username = username
+        self._password = password
+        self._uri = uri
+        self._dbname = dbname
 
         self._client: MongoClient | None = None
         self._db: Database | None = None
-
-    def _open(self) -> None:
-        if self.uri is not None:
-            uri = self.uri
-        else:
-            if self.username is not None and self.password is not None:
-                uri = "mongodb://%s:%s@%s:%s" % (
-                    quote_plus(self.username), quote_plus(self.password), self.host, self.port
-                )
-            else:
-                uri = "mongodb://%s:%s" % (self.host, self.port)
-
-        self._client = MongoClient(uri)
-        self._db = self._client[self.dbname]
-
-    def _close(self) -> None:
-        self._db = None
-
-        self._client.close()
-        self._client = None
 
     @classmethod
     def from_uri(cls, uri: str, dbname: str) -> Self:
         ins = super().from_uri(**dict(uri=uri, dbname=dbname))
         return ins
+
+    def open(self) -> None:
+        if self._uri is not None:
+            uri = self._uri
+        else:
+            if self._username is not None and self._password is not None:
+                uri = "mongodb://%s:%s@%s:%s" % (
+                    quote_plus(self._username), quote_plus(self._password), self._host, self._port
+                )
+            else:
+                uri = "mongodb://%s:%s" % (self._host, self._port)
+
+        self._client = MongoClient(uri)
+        self._db = self._client[self._dbname]
+
+    def close(self) -> None:
+        self._db = None
+
+        self._client.close()
+        self._client = None
+
+    @property
+    def client(self) -> MongoClient:
+        return self._client
+
+    @property
+    def db(self) -> Database:
+        return self._db

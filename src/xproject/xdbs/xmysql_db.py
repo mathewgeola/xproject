@@ -22,24 +22,24 @@ class MysqlDB(DB):
     ) -> None:
         super().__init__(*args, **kwargs)
 
-        self.host = host
-        self.port = port
-        self.username = username
-        self.password = password
-        self.dbname = dbname
-        self.charset = charset
+        self._host = host
+        self._port = port
+        self._username = username
+        self._password = password
+        self._dbname = dbname
+        self._charset = charset
 
         self._connection: Connection | None = None
         self._cursor: Cursor | None = None
 
     def open_connect(self) -> tuple[Connection, Cursor]:
         connection = connect(
-            user=self.username,
-            password=self.password,
-            host=self.host,
-            database=self.dbname,
-            port=self.port,
-            charset=self.charset,
+            user=self._username,
+            password=self._password,
+            host=self._host,
+            database=self._dbname,
+            port=self._port,
+            charset=self._charset,
         )
         cursor = connection.cursor()
         return connection, cursor
@@ -52,11 +52,19 @@ class MysqlDB(DB):
         if connection is not None:
             connection.close()
 
-    def _open(self) -> None:
+    def open(self) -> None:
         self._connection, self._cursor = self.open_connect()
 
-    def _close(self) -> None:
+    def close(self) -> None:
         self.close_connect(self._connection, self._cursor)
+
+    @property
+    def connection(self) -> Connection:
+        return self._connection
+
+    @property
+    def cursor(self) -> Cursor:
+        return self._cursor
 
     def query(self, sql: str, connection_cursor: tuple[Connection, Cursor] | None = None) -> list[dict[str, Any]]:
         if connection_cursor is not None:
