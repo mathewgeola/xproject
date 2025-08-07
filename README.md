@@ -6,4 +6,9 @@
 
 ~~~shell
 poetry run generate_init_py src/xproject
+
+or
+
+generate_init_py src/xproject
+
 ~~~

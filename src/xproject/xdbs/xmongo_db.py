@@ -2,7 +2,7 @@ from typing import Any, Self
 from urllib.parse import quote_plus
 
 from pymongo import MongoClient
-from pymongo.synchronous.database import Database
+from pymongo.database import Database
 
 from xproject.xdbs.xdb import DB
 
