@@ -1,3 +1,4 @@
+from . import scripts
 from . import xasyncio_priority_queue
 from . import xbase64
 from . import xbytes
@@ -22,6 +23,7 @@ from . import xmath
 from . import xmixins
 from . import xnetwork
 from . import xobjects
+from . import xrender
 from . import xreverse
 from . import xsignal
 from . import xspider
@@ -32,6 +34,7 @@ from . import xurl
 from . import xvalidators
 
 __all__ = [
+    "scripts",
     "xasyncio_priority_queue",
     "xbase64",
     "xbytes",
@@ -56,6 +59,7 @@ __all__ = [
     "xmixins",
     "xnetwork",
     "xobjects",
+    "xrender",
     "xreverse",
     "xsignal",
     "xspider",
