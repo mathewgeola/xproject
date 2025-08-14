@@ -1,0 +1,12 @@
+import xproject
+
+
+class {{ class_name }}(xproject.xobjects.xtask.Task):
+    def action(self, *args, **kwargs):
+        pass
+
+
+if __name__ == '__main__':
+    task = {{ class_name }}()
+    task.run()
+

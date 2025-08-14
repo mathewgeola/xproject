@@ -18,12 +18,16 @@ class GenerateInitPy:
         if os.path.basename(dir_path) == "__pycache__":
             return 0
 
-        py_file_names = [
-            file_name for file_name in sorted(os.listdir(dir_path))
-            if (file_name.endswith(".py") and file_name not in ("__init__.py", "__main__.py")) or
-               (os.path.isdir(os.path.join(dir_path, file_name)) and file_name != "__pycache__")
-        ]
-        module_names = [os.path.splitext(py_file_name)[0] for py_file_name in py_file_names]
+        module_names = []
+        for file_name in sorted(os.listdir(dir_path)):
+            file_path = os.path.join(dir_path, file_name)
+            if os.path.isfile(file_path):
+                if file_name.endswith(".py") and file_name not in ("__init__.py", "__main__.py"):
+                    module_names.append(os.path.splitext(file_name)[0])
+            elif os.path.isdir(file_path):
+                if file_name != "__pycache__" and any(map(lambda x: x.endswith(".py"), os.listdir(file_path))):
+                    module_names.append(file_name)
+
         if not module_names:
             return 0
 
@@ -64,5 +68,5 @@ __all__ = [
 
     @classmethod
     def main(cls, *args: Any) -> None:
-        dir_path = args[0] if len(args) >= 1 else sys.argv[1] if len(sys.argv) > 1 else "."
+        dir_path = os.path.abspath(args[0] if len(args) >= 1 else sys.argv[1] if len(sys.argv) > 1 else ".")
         sys.exit(cls._generate_init_py_by_root_dir_path(dir_path))

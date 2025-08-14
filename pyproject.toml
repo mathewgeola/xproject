@@ -1,6 +1,6 @@
 [project]
 name = "xproject"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = [
     { name = "mathewgeola", email = "mathewgeola@gmail.com" }
@@ -29,7 +29,8 @@ dependencies = [
     "redis (>=6.2.0,<7.0.0)",
     "sqlalchemy (>=2.0.42,<3.0.0)",
     "pymongo (==3.12.3)",
-    "jinja2 (>=3.1.6,<4.0.0)"
+    "jinja2 (>=3.1.6,<4.0.0)",
+    "jsonpath (>=0.82.2,<0.83.0)"
 ]
 
 
@@ -39,3 +40,5 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 generate_init_py = "xproject.scripts.generate_init_py:GenerateInitPy.main"
+render_handler_py = "xproject.scripts.renders.render_handler_py:RenderHandlerPy.main"
+render_task_py = "xproject.scripts.renders.render_task_py:RenderTaskPy.main"

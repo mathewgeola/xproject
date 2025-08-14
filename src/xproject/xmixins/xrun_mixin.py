@@ -8,7 +8,7 @@ class RunMixin(ABC):
     logger: Logger
 
     @abstractmethod
-    def action(self, *args, **kwargs) -> Any:
+    def action(self, *args, **kwargs):
         pass
 
     def run_ok_method(self, result: Any) -> Any:
