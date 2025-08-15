@@ -1,5 +1,6 @@
 from typing import Any
 
+import pandas as pd
 from pymysql import connect
 from pymysql.connections import Connection
 from pymysql.cursors import Cursor
@@ -66,11 +67,21 @@ class MysqlDB(DB):
     def cursor(self) -> Cursor:
         return self._cursor
 
-    def query(self, sql: str, connection_cursor: tuple[Connection, Cursor] | None = None) -> list[dict[str, Any]]:
+    def query(
+            self,
+            sql: str,
+            connection_cursor: tuple[Connection, Cursor] | None = None,
+            use_new_connect: bool = True,  # Using False is in single thread
+            return_df: bool = False
+    ) -> list[dict[str, Any]] | pd.DataFrame:
         if connection_cursor is not None:
             connection, cursor = connection_cursor
         else:
-            connection, cursor = self._connection, self._cursor
+            if use_new_connect:
+                connection_cursor = self.open_connect()
+                connection, cursor = connection_cursor
+            else:
+                connection, cursor = self._connection, self._cursor
 
         cursor.execute(sql)
         result = cursor.fetchall()
@@ -79,5 +90,8 @@ class MysqlDB(DB):
 
         if connection_cursor is not None:
             self.close_connect(connection, cursor)
+
+        if return_df:
+            return pd.DataFrame(rows)
 
         return rows
