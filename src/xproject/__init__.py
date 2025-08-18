@@ -3,6 +3,7 @@ from . import xasyncio_priority_queue
 from . import xbase64
 from . import xbytes
 from . import xcall
+from . import xcommand
 from . import xcookies
 from . import xdata
 from . import xdataclasses
@@ -10,6 +11,7 @@ from . import xdatetime
 from . import xdbs
 from . import xexceptions
 from . import xfile
+from . import xhandler
 from . import xheaders
 from . import xhtml
 from . import xhttp
@@ -22,13 +24,14 @@ from . import xlogger
 from . import xmath
 from . import xmixins
 from . import xnetwork
-from . import xobjects
+from . import xnotifier
 from . import xrender
 from . import xreverse
 from . import xsignal
 from . import xspider
 from . import xsql
 from . import xstring
+from . import xtask
 from . import xtypes
 from . import xurl
 from . import xvalidators
@@ -39,6 +42,7 @@ __all__ = [
     "xbase64",
     "xbytes",
     "xcall",
+    "xcommand",
     "xcookies",
     "xdata",
     "xdataclasses",
@@ -46,6 +50,7 @@ __all__ = [
     "xdbs",
     "xexceptions",
     "xfile",
+    "xhandler",
     "xheaders",
     "xhtml",
     "xhttp",
@@ -58,13 +63,14 @@ __all__ = [
     "xmath",
     "xmixins",
     "xnetwork",
-    "xobjects",
+    "xnotifier",
     "xrender",
     "xreverse",
     "xsignal",
     "xspider",
     "xsql",
     "xstring",
+    "xtask",
     "xtypes",
     "xurl",
     "xvalidators",
