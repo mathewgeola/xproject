@@ -21,3 +21,11 @@ def split_list(data: list[Any], num_parts: int | None = None, part_size: int | N
         raise ValueError(
             f"Either num_parts: {num_parts!r} or part_size: {part_size!r} must be provided"
         )
+
+
+def flatten_list(data: list[Any]) -> list[Any]:
+    return sum((flatten_list(x) if isinstance(x, list) else [x] for x in data), [])
+
+
+if __name__ == '__main__':
+    print(flatten_list([1, 2, [3, 4], [5, 6, 7]]))

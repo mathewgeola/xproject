@@ -1,9 +1,12 @@
 import os
+import re
 import sys
 from typing import Any
 
 from rich.console import Console
 from rich.syntax import Syntax
+
+from xproject.xlist import flatten_list
 
 console = Console()
 
@@ -19,11 +22,35 @@ class GenerateInitPy:
             return 0
 
         module_names = []
+
+        init_py_file_content_addition_a = None
+        init_py_file_content_addition_b = None
+
         for file_name in sorted(os.listdir(dir_path)):
             file_path = os.path.join(dir_path, file_name)
             if os.path.isfile(file_path):
-                if file_name.endswith(".py") and file_name not in ("__init__.py", "__main__.py"):
-                    module_names.append(os.path.splitext(file_name)[0])
+                if file_name == "xproject.__init__.py":
+                    try:
+                        with open(file_path, "r", encoding="utf-8") as file:
+                            content = file.read()
+
+                            init_py_file_content_addition_a = "\n".join(
+                                sorted(
+                                    re.findall(r"(from .*? import .*?)\n", content, re.DOTALL)
+                                )
+                            )
+                            init_py_file_content_addition_b = ",\n    ".join([
+                                f"\"{module_name}\"" for module_name in
+                                sorted(
+                                    flatten_list([i.split(", ") if ", " in i else i for i in
+                                                  re.findall(r"from .*? import (.*?)\n", content, re.DOTALL)])
+                                )
+                            ])
+                    except Exception:  # noqa
+                        pass
+                else:
+                    if file_name.endswith(".py") and file_name not in ("__init__.py", "__main__.py"):
+                        module_names.append(os.path.splitext(file_name)[0])
             elif os.path.isdir(file_path):
                 if file_name != "__pycache__" and any(map(lambda x: x.endswith(".py"), os.listdir(file_path))):
                     module_names.append(file_name)
@@ -34,7 +61,19 @@ class GenerateInitPy:
         init_py_file_content_a = "\n".join(f"from . import {module_name}" for module_name in module_names)
         init_py_file_content_b = ",\n    ".join(f"\"{module_name}\"" for module_name in module_names)
 
-        init_py_file_content = f"""{init_py_file_content_a}
+        if init_py_file_content_addition_a is not None and init_py_file_content_addition_b is not None:
+            init_py_file_content = f"""{init_py_file_content_addition_a}
+
+{init_py_file_content_a}
+
+__all__ = [
+    {init_py_file_content_addition_b},
+
+    {init_py_file_content_b},
+]
+"""
+        else:
+            init_py_file_content = f"""{init_py_file_content_a}
 
 __all__ = [
     {init_py_file_content_b},

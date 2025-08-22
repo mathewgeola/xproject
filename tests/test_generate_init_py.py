@@ -1,4 +1,4 @@
-from scripts.generate_init_py import main
+from xproject.scripts.generate_init_py import GenerateInitPy
 
 if __name__ == '__main__':
-    main("../src/xproject")
+    GenerateInitPy.main("../src/xproject")

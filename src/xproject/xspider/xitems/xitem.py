@@ -2,7 +2,10 @@ from abc import ABCMeta
 from collections.abc import MutableMapping, Iterator
 from copy import deepcopy
 from pprint import pformat
+from types import new_class
 from typing import Any, Self, Final
+
+from scrapy.item import Field as ScrapyField, Item as ScrapyItem, Item
 
 from xproject.xexceptions import InitException, GetattributeException
 from xproject.xspider.xitems.xfield import Field
@@ -15,7 +18,7 @@ class ItemMeta(ABCMeta):
         fields = dict()
         new_attrs = dict()
 
-        if (model_class := attrs.get("_MODEL")) is not None:
+        if (model_class := attrs.get("MODEL")) is not None:
             model_class: Model
             for column in model_class.columns():
                 fields[column] = Field()
@@ -28,15 +31,20 @@ class ItemMeta(ABCMeta):
 
         cls = super().__new__(mcs, name, bases, new_attrs)
         cls._FIELDS = fields
+        cls.SCRAPY_ITEM = new_class(
+            name.replace("Item", "ScrapyItem"), (ScrapyItem,),
+            exec_body=lambda ns: ns.update({field: ScrapyField() for field in cls._FIELDS})
+        )
         return cls
 
 
-ItemValidName: Final[list[str]] = ["_MODEL", "_FIELDS", "_item", "unassigned_keys"]
+ItemValidName: Final[list[str]] = ["_FIELDS", "MODEL", "SCRAPY_ITEM", "_item", "unassigned_keys"]
 
 
 class Item(MutableMapping, metaclass=ItemMeta):
     _FIELDS: dict[str, Field]
-    _MODEL: Model
+    MODEL: Model
+    SCRAPY_ITEM: type[ScrapyItem]
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._item: Final[dict[str, Any]] = dict()
@@ -107,6 +115,13 @@ class Item(MutableMapping, metaclass=ItemMeta):
     def to_dict(self) -> dict[str, Any]:
         return dict(self)
 
+    def to_scrapy_item(self) -> ScrapyItem:
+        return self.SCRAPY_ITEM(**self.to_dict())
+
+    @classmethod
+    def create_by_scrapy_item(cls, scrapy_item: ScrapyItem) -> Self:
+        return cls(**dict(scrapy_item))
+
     def copy(self) -> Self:
         return deepcopy(self)
 
@@ -169,7 +184,7 @@ if __name__ == '__main__':
             print(type(e), e)
 
         item = TestItem()
-        item["name"] = "xspider"
+        item["name"] = "xproject"
         item["age"] = 18
         print(item)
 

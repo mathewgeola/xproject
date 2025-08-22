@@ -1,7 +1,7 @@
 from pprint import pformat
 
 from tests.test_xsqlalchemy_model.item import PersonItem
-from tests.test_xsqlalchemy_model.model import Person
+from tests.test_xsqlalchemy_model.model import PersonModel
 
 
 class Spider:
@@ -11,13 +11,16 @@ class Spider:
         item["gender"] = "男"
         item["age"] = 24
 
-        row = Person.get_row_by_data_id(item)
+        scrapy_item = item.to_scrapy_item()
+        item = PersonItem.create_by_scrapy_item(scrapy_item)
+
+        row = PersonModel.get_row_by_data_id(item)
         if row:
             print("update:\n", pformat(row))
         else:
             print("insert:\n", pformat(item.to_dict()))
 
-        Person.save(item)
+        PersonModel.save(item)
 
 
 if __name__ == '__main__':

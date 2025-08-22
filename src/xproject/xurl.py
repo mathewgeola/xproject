@@ -113,8 +113,8 @@ def decode(url: str) -> dict[str, str]:
 
 def join_url(base_url: str, url: str) -> str:
     """
-    >>> join_url("https://www.baidu.com/", "/s?ie=UTF-8&wd=xspider")
-    'https://www.baidu.com/s?ie=UTF-8&wd=xspider'
+    >>> join_url("https://www.baidu.com/", "/s?ie=UTF-8&wd=xproject")
+    'https://www.baidu.com/s?ie=UTF-8&wd=xproject'
 
     :param base_url:
     :param url:
@@ -142,8 +142,8 @@ def join_params(url: str, params: dict[str, Any]) -> str:
 
 def get_params(url: str) -> dict[str, str]:
     """
-    >>> get_params("https://www.baidu.com/s?wd=xspider")
-    {'wd': 'xspider'}
+    >>> get_params("https://www.baidu.com/s?wd=xproject")
+    {'wd': 'xproject'}
 
     :param url:
     :return:
@@ -155,8 +155,8 @@ def get_params(url: str) -> dict[str, str]:
 
 def get_param(url: str, key: str, default: Any | None = None) -> Any:
     """
-    >>> get_param("https://www.baidu.com/s?wd=xspider", "wd")
-    'xspider'
+    >>> get_param("https://www.baidu.com/s?wd=xproject", "wd")
+    'xproject'
 
     :param url:
     :param key:
@@ -170,8 +170,8 @@ def get_param(url: str, key: str, default: Any | None = None) -> Any:
 
 def get_url_params(url: str) -> tuple[str, dict[str, str]]:
     """
-    >>> get_url_params("https://www.baidu.com/s?wd=xspider")
-    ('https://www.baidu.com/s', {'wd': 'xspider'})
+    >>> get_url_params("https://www.baidu.com/s?wd=xproject")
+    ('https://www.baidu.com/s', {'wd': 'xproject'})
 
     :param url:
     :return:
@@ -193,7 +193,7 @@ def get_url_params(url: str) -> tuple[str, dict[str, str]]:
 
 def get_domain(url: str) -> str:
     """
-    >>> get_domain("https://www.baidu.com/s?wd=xspider")
+    >>> get_domain("https://www.baidu.com/s?wd=xproject")
     'baidu'
 
     :param url:
@@ -219,8 +219,8 @@ def get_subdomain(url: str) -> str:
 
 def canonicalize(url: str) -> str:
     """
-    >>> canonicalize("https://www.baidu.com/s?wd=xspider")
-    'https://www.baidu.com/s?wd=xspider'
+    >>> canonicalize("https://www.baidu.com/s?wd=xproject")
+    'https://www.baidu.com/s?wd=xproject'
 
     :param url:
     :return:

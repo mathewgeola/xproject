@@ -1,6 +1,6 @@
 import xproject
-from tests.test_xsqlalchemy_model.model import Person
+from tests.test_xsqlalchemy_model.model import PersonModel
 
 
-class PersonItem(xproject.xspider.xitems.xitem.Item):
-    _MODEL = Person
+class PersonItem(xproject.Item):
+    MODEL = PersonModel

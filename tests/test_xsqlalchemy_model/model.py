@@ -9,8 +9,8 @@ engine = create_engine(
 )
 
 
-class Person(xproject.xspider.xmodels.xsqlalchemy_model.SqlalchemyModel):
-    # __tablename__ = "person"
+class PersonModel(xproject.SqlalchemyModel):
+    __tablename__ = "person"
     __engine__ = engine
     __data_columns__ = ["name", "gender"]
 
@@ -19,8 +19,4 @@ class Person(xproject.xspider.xmodels.xsqlalchemy_model.SqlalchemyModel):
     age = Column(Integer, comment="age")
 
 
-Person.create_table()
-
-__all__ = [
-    "Person",
-]
+PersonModel.create_table()
