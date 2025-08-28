@@ -12,7 +12,7 @@ class Spider:
         item["age"] = 24
 
         scrapy_item = item.to_scrapy_item()
-        item = PersonItem.create_by_scrapy_item(scrapy_item)
+        item = scrapy_item.to_item()
 
         row = PersonModel.get_row_by_data_id(item)
         if row:

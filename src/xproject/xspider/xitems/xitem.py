@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import re
 from abc import ABCMeta
 from collections.abc import MutableMapping, Iterator
 from copy import deepcopy
@@ -5,12 +8,16 @@ from pprint import pformat
 from types import new_class
 from typing import Any, Self, Final
 
-from scrapy.item import Field as ScrapyField, Item as ScrapyItem, Item
+from scrapy.item import Field as ScrapyField, Item as ScrapyItem
 
 from xproject.xexceptions import InitException, GetattributeException
 from xproject.xspider.xitems.xfield import Field
 from xproject.xspider.xmodels.xmodel import Model
 from xproject.xtypes import ViewClasses, create_view_classes
+
+
+class ScrapyItemImpl(ScrapyItem):
+    def to_item(self) -> Item: ...
 
 
 class ItemMeta(ABCMeta):
@@ -30,21 +37,24 @@ class ItemMeta(ABCMeta):
                 new_attrs[key] = value
 
         cls = super().__new__(mcs, name, bases, new_attrs)
+
         cls._FIELDS = fields
+
         cls.SCRAPY_ITEM = new_class(
-            name.replace("Item", "ScrapyItem"), (ScrapyItem,),
-            exec_body=lambda ns: ns.update({field: ScrapyField() for field in cls._FIELDS})
+            re.sub(r"Item$", "", name) + "ScrapyItem", (ScrapyItem,),
+            exec_body=lambda ns: ns.update(
+                {field: ScrapyField() for field in cls._FIELDS} |
+                {"to_item": lambda self: cls.create_by_scrapy_item(self)}  # noqa
+            )
         )
+
         return cls
-
-
-ItemValidName: Final[list[str]] = ["_FIELDS", "MODEL", "SCRAPY_ITEM", "_item", "unassigned_keys"]
 
 
 class Item(MutableMapping, metaclass=ItemMeta):
     _FIELDS: dict[str, Field]
     MODEL: Model
-    SCRAPY_ITEM: type[ScrapyItem]
+    SCRAPY_ITEM: type[ScrapyItemImpl]
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._item: Final[dict[str, Any]] = dict()
@@ -76,7 +86,7 @@ class Item(MutableMapping, metaclass=ItemMeta):
         return self._item[key]
 
     def __setattr__(self, name: str, value: Any) -> None:
-        if name not in ItemValidName:
+        if name != "_item":
             raise AttributeError(
                 f"{self.__class__.__name__} attribute assignment error: "
                 f"Cannot set attribute {name!r} directly "
@@ -115,7 +125,7 @@ class Item(MutableMapping, metaclass=ItemMeta):
     def to_dict(self) -> dict[str, Any]:
         return dict(self)
 
-    def to_scrapy_item(self) -> ScrapyItem:
+    def to_scrapy_item(self) -> ScrapyItemImpl:
         return self.SCRAPY_ITEM(**self.to_dict())
 
     @classmethod
