@@ -5,14 +5,12 @@ import json
 import re
 from abc import ABCMeta
 from collections.abc import Iterable
-from datetime import datetime
+from contextlib import contextmanager
 from typing import Any, Self, TYPE_CHECKING, cast
 
-from sqlalchemy import Column, Integer, String, DateTime, SmallInteger, JSON
-from sqlalchemy import Engine
+from sqlalchemy import Engine, Column, Integer, String, DateTime, SmallInteger, JSON, func
 from sqlalchemy.engine.interfaces import Dialect
-from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import declarative_base, sessionmaker, Session
+from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.sql.type_api import TypeEngine
 from sqlalchemy.types import Text, TypeDecorator
 
@@ -68,13 +66,13 @@ class SqlalchemyModelMeta(type(Base), ABCMeta):
         if not (isinstance(data_columns, list) and all(map(lambda x: isinstance(x, str), data_columns))):
             raise ValueError(f"Illegal assignment {name}.__data_columns__")
 
-        session = attrs.get("__session__")
-        if session is None:
-            session = sessionmaker(bind=engine)()
-            attrs["__session__"] = session
+        session_factory = attrs.get("__session_factory__")
+        if session_factory is None:
+            session_factory = sessionmaker(bind=engine)
+            attrs["__session_factory__"] = session_factory
         else:
-            if not isinstance(session, Session):
-                raise ValueError(f"Illegal assignment {name}.__session__")
+            if not isinstance(session_factory, sessionmaker):
+                raise ValueError(f"Illegal assignment {name}.__session_factory__")
 
         return super().__new__(mcs, name, bases, attrs)
 
@@ -85,14 +83,14 @@ class SqlalchemyModel(Base, Model, metaclass=SqlalchemyModelMeta):
     __tablename__: str
     __engine__: Engine
     __data_columns__: list[str]
-    __session__: Session
+    __session_factory__: sessionmaker
 
     id = Column(Integer, comment="id", primary_key=True, autoincrement=True)
     data_id = Column(String(64), comment="data id", nullable=False, unique=True)
     data_columns = Column(JSON, comment="data columns", nullable=False)
     data_status = Column(SmallInteger, comment="data status", default=DataStatusEnum.OK.value, index=True)
-    data_create_time = Column(DateTime, comment="data create time", default=datetime.now)
-    data_update_time = Column(DateTime, comment="data update time", default=datetime.now, onupdate=datetime.now)
+    data_create_time = Column(DateTime, comment="data create time", server_default=func.now())
+    data_update_time = Column(DateTime, comment="data update time", server_default=func.now(), onupdate=func.now())
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} (id={self.id}, data_id={self.data_id})>"
@@ -102,6 +100,20 @@ class SqlalchemyModel(Base, Model, metaclass=SqlalchemyModelMeta):
         jsn = json.dumps(data, ensure_ascii=False, cls=JSONEncoder)
         row = json.loads(jsn)
         return row
+
+    @classmethod
+    @contextmanager
+    def get_session(cls, read_only: bool = False):
+        session = cls.__session_factory__()
+        try:
+            yield session
+            if not read_only:
+                session.commit()
+        except:
+            session.rollback()
+            raise
+        finally:
+            session.close()
 
     @classmethod
     def gen_data_id(cls, data: dict[str, Any] | Item) -> str:
@@ -118,53 +130,50 @@ class SqlalchemyModel(Base, Model, metaclass=SqlalchemyModelMeta):
     @classmethod
     def get_data_id(cls, data: dict[str, Any] | Item) -> str:
         if "data_id" in data:
-            if isinstance(data["data_id"], str) and re.match(r"^[0-9a-f]{32}$", data["data_id"]) is not None:
+            if isinstance(data["data_id"], str) and re.match(r"^[0-9a-f]{64}$", data["data_id"]) is not None:
                 return data["data_id"]
         return cls.gen_data_id(data)
 
     @classmethod
     def get_ins_by_data_id(cls, data: dict[str, Any] | Item) -> Self | None:
-        session = cls.__session__
-        data_id = cls.get_data_id(data)
-        try:
-            ins: Self = session.query(cls).filter_by(data_id=data_id).one()
-        except NoResultFound:
-            return None
-        return ins
+        with cls.get_session(read_only=True) as session:
+            data_id = cls.get_data_id(data)
+            ins: Self = session.query(cls).filter_by(data_id=data_id).one_or_none()
+            if ins is None:
+                return None
+            session.expunge(ins)
+            return ins
 
     @classmethod
     def get_row_by_data_id(cls, data: dict[str, Any] | Item) -> dict[str, Any] | None:
-        ins = cls.get_ins_by_data_id(data)
-        if ins is None:
-            return None
-        data = ins.to_row()
-        return data
+        with cls.get_session(read_only=True) as session:
+            data_id = cls.get_data_id(data)
+            ins: Self = session.query(cls).filter_by(data_id=data_id).one_or_none()
+            if ins is None:
+                return None
+            return ins.to_row()
 
     @classmethod
     def save(cls, data: dict[str, Any] | Item) -> bool:
-        session = cls.__session__
+        with cls.get_session() as session:
+            data_id = cls.get_data_id(data)
+            ins: Self = session.query(cls).filter_by(data_id=data_id).one_or_none()
+            insert = ins is None
 
-        ins = cls.get_ins_by_data_id(data)
-        update = False if ins is None else True
+            if insert:
+                # insert
+                ins = cls(
+                    data_id=data_id,
+                    data_columns=cls.__data_columns__,
+                    **data
+                )
+                session.add(ins)
+            else:
+                # update
+                for k, v in data.items():
+                    setattr(ins, k, v)
 
-        if not update:
-            # insert
-            ins = cls(
-                data_id=cls.get_data_id(data),
-                data_columns=cls.__data_columns__,
-                **data
-            )
-            session.add(ins)
-        else:
-            # update
-            if ins is None:
-                ins = cls.get_ins_by_data_id(data)
-            for k, v in data.items():
-                setattr(ins, k, v)
-
-        session.commit()
-
-        return update
+            return insert
 
     @classmethod
     def create_table(cls) -> None:

@@ -1,8 +1,9 @@
-from typing import Any
+from typing import Any, Self
 
 from redis import Redis
 
 from xproject.xdbs.xdb import DB
+from xproject.xurl import get_furl_obj
 
 
 class RedisDB(DB):
@@ -41,3 +42,13 @@ class RedisDB(DB):
     @property
     def redis(self) -> Redis:
         return self._redis
+
+    @classmethod
+    def from_uri(cls, uri: str) -> Self:
+        furl = get_furl_obj(uri)
+        kwargs = dict()
+        kwargs["host"] = furl.host
+        kwargs["port"] = furl.port
+        kwargs["password"] = furl.password
+        kwargs["dbname"] = furl.path.segments[0]
+        return super().from_uri(**kwargs)

@@ -13,4 +13,4 @@ from xproject.xspider.xenums.xdata_status_enum import DataStatusEnum
 from xproject.xhandler import Handler
 from xproject.xtask import Task
 
-from xproject.xlogger import get_logger
+from xproject.xlogger import get_logger, logger

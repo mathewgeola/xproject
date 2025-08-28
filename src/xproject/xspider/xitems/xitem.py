@@ -129,6 +129,12 @@ class Item(MutableMapping, metaclass=ItemMeta):
         return self.SCRAPY_ITEM(**self.to_dict())
 
     @classmethod
+    def create_scrapy_item(cls, data: dict[str, Any] | None = None) -> ScrapyItemImpl:
+        if data is not None:
+            return cls.SCRAPY_ITEM(**data)
+        return cls.SCRAPY_ITEM()
+
+    @classmethod
     def create_by_scrapy_item(cls, scrapy_item: ScrapyItem) -> Self:
         return cls(**dict(scrapy_item))
 

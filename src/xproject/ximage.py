@@ -18,6 +18,9 @@ def image_to_jpg(
             image_file_prefix, _ = os.path.splitext(image_file_path)
             jpg_file_path = image_file_prefix + ".jpg"
 
+        if image_file_path == jpg_file_path:
+            return jpg_file_path
+
         jpg_dir_path = os.path.dirname(jpg_file_path)
         if not os.path.exists(jpg_dir_path):
             os.makedirs(jpg_dir_path, exist_ok=True)
@@ -57,7 +60,8 @@ if __name__ == '__main__':
         # "https://img.jslink.com/FILE41f4c4a5db4e4007b09ae2dd2e08d853.JPG"
         # "https://www.cnncmall.com/photos/std-commodity/202505/802ae6c95ce01f49f1f9dada51169fa3.gif"
         # "https://www.cnncmall.com/photos/std-commodity/202506/324119dde7a483b0c54fdf7b2a5cbc2d.JPG"
-        "https://www.cnncmall.com/photos/std-commodity/202506/d09b671afd9ef8d1ef7abc86acf9d021.png"
+        # "https://www.cnncmall.com/photos/std-commodity/202506/d09b671afd9ef8d1ef7abc86acf9d021.png"
+        "https://fsyuncai.oss-cn-beijing.aliyuncs.com/2025-08-20/FILE6042f63720014c76bb4473e28710ad63.jpg"
     )
-    output_file_path = image_to_jpg(input_file_path, keep_original=True)
+    output_file_path = image_to_jpg(input_file_path, keep_original=False)
     print(f"{input_file_path} => {output_file_path}")

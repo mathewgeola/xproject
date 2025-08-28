@@ -3,7 +3,7 @@ from xproject.xdbs.xmongo_db import MongoDB
 from xproject.xdbs.xmysql_db import MysqlDB
 from xproject.xdbs.xredis_db import RedisDB
 from xproject.xhandler import Handler
-from xproject.xlogger import get_logger
+from xproject.xlogger import get_logger, logger
 from xproject.xspider.xenums.xdata_status_enum import DataStatusEnum
 from xproject.xspider.xitems.xfield import Field
 from xproject.xspider.xitems.xitem import Item
@@ -38,6 +38,7 @@ from . import xmath
 from . import xmixins
 from . import xnetwork
 from . import xnotifier
+from . import xpandas
 from . import xrender
 from . import xreverse
 from . import xsignal
@@ -62,6 +63,7 @@ __all__ = [
     "SqlalchemyModel",
     "Task",
     "get_logger",
+    "logger",
 
     "scripts",
     "xasyncio_priority_queue",
@@ -90,6 +92,7 @@ __all__ = [
     "xmixins",
     "xnetwork",
     "xnotifier",
+    "xpandas",
     "xrender",
     "xreverse",
     "xsignal",
