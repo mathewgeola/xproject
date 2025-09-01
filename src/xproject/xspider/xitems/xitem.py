@@ -17,7 +17,7 @@ from xproject.xtypes import ViewClasses, create_view_classes
 
 
 class ScrapyItemImpl(ScrapyItem):
-    def to_item(self) -> Item: ...
+    def to_xproject_item(self) -> Item: ...
 
 
 class ItemMeta(ABCMeta):
@@ -26,7 +26,7 @@ class ItemMeta(ABCMeta):
         new_attrs = dict()
 
         if (model_class := attrs.get("MODEL")) is not None:
-            model_class: Model
+            model_class: type[Model]
             for column in model_class.columns():
                 fields[column] = Field()
 
@@ -40,11 +40,11 @@ class ItemMeta(ABCMeta):
 
         cls._FIELDS = fields
 
-        cls.SCRAPY_ITEM = new_class(
+        cls._SCRAPY_ITEM = new_class(
             re.sub(r"Item$", "", name) + "ScrapyItem", (ScrapyItem,),
             exec_body=lambda ns: ns.update(
                 {field: ScrapyField() for field in cls._FIELDS} |
-                {"to_item": lambda self: cls.create_by_scrapy_item(self)}  # noqa
+                {"to_xproject_item": lambda self: cls.create_by_scrapy_item(self)}  # noqa
             )
         )
 
@@ -52,9 +52,9 @@ class ItemMeta(ABCMeta):
 
 
 class Item(MutableMapping, metaclass=ItemMeta):
+    MODEL: type[Model]
     _FIELDS: dict[str, Field]
-    MODEL: Model
-    SCRAPY_ITEM: type[ScrapyItemImpl]
+    _SCRAPY_ITEM: type[ScrapyItemImpl]
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._item: Final[dict[str, Any]] = dict()
@@ -122,24 +122,35 @@ class Item(MutableMapping, metaclass=ItemMeta):
 
     __str__ = __repr__
 
-    def to_dict(self) -> dict[str, Any]:
-        return dict(self)
+    @classmethod
+    def get_model_class(cls) -> type[Model]:
+        return cls.MODEL
 
-    def to_scrapy_item(self) -> ScrapyItemImpl:
-        return self.SCRAPY_ITEM(**self.to_dict())
+    @classmethod
+    def get_scrapy_item_class(cls) -> type[ScrapyItemImpl]:
+        return cls._SCRAPY_ITEM
 
     @classmethod
     def create_scrapy_item(cls, data: dict[str, Any] | None = None) -> ScrapyItemImpl:
         if data is not None:
-            return cls.SCRAPY_ITEM(**data)
-        return cls.SCRAPY_ITEM()
+            return cls.get_scrapy_item_class()(**data)
+        return cls.get_scrapy_item_class()()
 
     @classmethod
     def create_by_scrapy_item(cls, scrapy_item: ScrapyItem) -> Self:
         return cls(**dict(scrapy_item))
 
+    def to_dict(self) -> dict[str, Any]:
+        return dict(self)
+
+    def to_scrapy_item(self) -> ScrapyItemImpl:
+        return self.create_scrapy_item(self.to_dict())
+
     def copy(self) -> Self:
         return deepcopy(self)
+
+    def save(self) -> bool:
+        return self.get_model_class().save(self)
 
     @classmethod
     @property

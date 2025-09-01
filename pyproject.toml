@@ -1,6 +1,6 @@
 [project]
 name = "xproject"
-version = "0.1.8"
+version = "0.1.9"
 description = ""
 authors = [
     { name = "mathewgeola", email = "mathewgeola@gmail.com" }
@@ -35,6 +35,8 @@ dependencies = [
     "gmssl (>=3.2.2,<4.0.0)",
     "scrapy (==2.13.3)",
     "mini-racer (>=0.12.4,<0.13.0)",
+    "bs4 (>=0.0.2,<0.0.3)",
+    "requests (>=2.32.5,<3.0.0)",
 ]
 
 
