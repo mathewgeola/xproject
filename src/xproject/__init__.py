@@ -10,6 +10,9 @@ from xproject.xspider.xitems.xitem import Item
 from xproject.xspider.xmodels.xmodel import Model
 from xproject.xspider.xmodels.xsqlalchemy_model import SqlalchemyModel
 from xproject.xtask import Task
+from xproject.xutils.xadb import ADB
+from xproject.xutils.xaliyun_oss import AliyunOSS
+from xproject.xutils.xfrida import Frida
 
 from . import scripts
 from . import xasyncio_priority_queue
@@ -48,12 +51,16 @@ from . import xstring
 from . import xtask
 from . import xtypes
 from . import xurl
+from . import xutils
 from . import xvalidators
 
 __all__ = [
+    "ADB",
     "AccountDataclass",
+    "AliyunOSS",
     "DataStatusEnum",
     "Field",
+    "Frida",
     "Handler",
     "Item",
     "Model",
@@ -102,5 +109,6 @@ __all__ = [
     "xtask",
     "xtypes",
     "xurl",
+    "xutils",
     "xvalidators",
 ]

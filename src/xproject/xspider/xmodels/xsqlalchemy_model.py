@@ -116,6 +116,10 @@ class SqlalchemyModel(Base, Model, metaclass=SqlalchemyModelMeta):
             session.close()
 
     @classmethod
+    def get_table_name(cls) -> str:
+        return cls.__tablename__
+
+    @classmethod
     def gen_data_id(cls, data: dict[str, Any] | Item) -> str:
         data_column_value_strs = []
         for data_column in cls.__data_columns__:

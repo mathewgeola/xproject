@@ -7,6 +7,15 @@ from Crypto.Cipher import AES as AES_
 from Crypto.Util.Padding import pad
 
 
+def zero_pad(data_bytes: bytes, block_size: int = 16) -> bytes:
+    pad_len = (block_size - (len(data_bytes) % block_size)) % block_size
+    return data_bytes + b"\x00" * pad_len
+
+
+def zero_unpad(data_bytes: bytes) -> bytes:
+    return data_bytes.rstrip(b"\x00")
+
+
 def string_to_hex(string: str) -> str:
     """
     >>> string_to_hex("hi")

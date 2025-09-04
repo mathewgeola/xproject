@@ -237,6 +237,7 @@ def url_to_file_path(
         file_prefix: str | None = None,
         file_suffix: str | None = None,
         use_cache: bool = True,
+        chunk_size: int = 64 * 1024
 ) -> str | None:
     if not is_valid(url):
         return None
@@ -284,12 +285,13 @@ def url_to_file_path(
         os.makedirs(dir_path)
 
     try:
-        response = httpx.get(url, headers=headers)
-        content = response.content
-        data = cast(Buffer, content)
-        with open(file_path, "wb") as f:
-            f.write(data)
-    except Exception:  # noqa
+        with httpx.Client(timeout=None, follow_redirects=True) as client:
+            with client.stream("GET", url, headers=headers) as response:
+                response.raise_for_status()
+                with open(file_path, "wb") as f:
+                    for chunk in response.iter_bytes(chunk_size=chunk_size):
+                        f.write(chunk)
+    except Exception as e:  # noqa
         file_path = None
 
     return file_path
